@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>ro.sendahl - misc</title><link href="http://ro.sendahl.de/" rel="alternate"></link><link href="http://ro.sendahl.de/feeds/misc.atom.xml" rel="self"></link><id>http://ro.sendahl.de/</id><updated>2018-04-29T14:00:00+02:00</updated><entry><title>Welcome</title><link href="http://ro.sendahl.de/welcome.html" rel="alternate"></link><published>2018-04-29T14:00:00+02:00</published><updated>2018-04-29T14:00:00+02:00</updated><author><name>Hendrik Rosendahl</name></author><id>tag:ro.sendahl.de,2018-04-29:/welcome.html</id><summary type="html">&lt;p&gt;The first post&lt;/p&gt;</summary><content type="html">&lt;p&gt;Hello and welcome.&lt;/p&gt;
-&lt;p&gt;I am not sure if this will be a thing I do frequently,
-moreover I am not a fan of writing, so that might be hindering.&lt;/p&gt;
-&lt;p&gt;On the other hand, we will see what the future holds.&lt;/p&gt;
-&lt;p&gt;Welcome again!&lt;/p&gt;</content></entry></feed>
