@@ -1,7 +1,7 @@
 Title: Workaround for newsboat not able to access Tumblr RSS feed
 Date: 2018-08-07 12:15
-Modified: 2018-08-07 12:15
-Category: programs
+Modified: 2018-08-10 10:45
+Category: configs
 Tags: newsboat, Tumblr, RSS
 Slug: workaround-newsboat-tumblr
 Authors: Hendrik Rosendahl
