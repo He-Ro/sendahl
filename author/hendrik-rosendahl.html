@@ -28,7 +28,81 @@
         </div>
     </header>
     <div id="wrapper">
-        <div id="content">            <h4 class="date">Aug 07, 2018</h4>
+        <div id="content">            <h4 class="date">Aug 10, 2018</h4>
+
+            <article class="post">
+                <h2 class="title">
+                    <a href="https://ro.sendahl.de/qutebrowser-javascript-config.html" rel="bookmark" title="Permanent Link to &quot;My JavaScript toggle in qutebrowser&quot;">My JavaScript toggle in qutebrowser</a>
+                </h2>
+
+                <p>This post is about <a href="https://www.qutebrowser.org/">qutebrowser</a> the browser I am currently mainly using.
+It supports being controlled mainly with the keyboard and the keybindings are inspired by vim, which is a nice feature.</p>
+<p>To configure qutebrowser you can either do it with commands such as <code>:set config &lt;value&gt;</code> or <code>:bind 'xx' 'awesome command'</code>.
+Those configurations are stored in a <code>autoconfig.yml</code> file which gets loaded by qutebrowser.
+For more advanced configurations such as reading colors from Xresources one can also use a <code>config.py</code> file, which is essentially a Python file that modifies the special variables <code>c</code> and <code>config</code>.
+So instead of doing <code>:set content.javascript.enabled False</code> in the browser, you would add <code>c.content.javascript.enabled = False</code> in the Python config.
+Now if you use a <code>config.py</code> file the <code>autoconfig.yml</code> file is no longer read automatically.
+You can still use it by explicitly loading it in your <code>config.py</code> file, but I like to not use the <code>autoconfig.yml</code> file.
+This way I can experiment in the browser by setting some configuration options or adding key bindings and they disappear after I close qutebrowser.</p>
+<p><em>(Note: For <code>:set</code> there exists the <code>--temp</code> flag, which acchieves a similar effect, but for bind it is not presently available and also I often forgot to add the <code>--temp</code> flag)</em></p>
+<p>So I added the following to my <code>config.py</code> file:</p>
+<div class="highlight"><pre><span></span><span class="n">c</span><span class="o">.</span><span class="n">javascript</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="c1"># Load allowed javascript hosts at startup</span>
+<span class="n">ALLOWED_HOSTS_FILE</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">configdir</span> <span class="o">/</span> <span class="s1">&#39;javascript_allowed_hosts.txt&#39;</span>                                                                        
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ALLOWED_HOSTS_FILE</span><span class="p">)</span> <span class="k">as</span> <span class="n">allowed_hosts</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">allowed_hosts</span><span class="p">:</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;content.javascript.enabled&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="s1">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pattern</span><span class="p">))</span>                                                                  
+
+<span class="c1"># Add required bindings</span>
+<span class="n">JS_TOGGLE</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">configdir</span> <span class="o">/</span> <span class="s1">&#39;javascript_toggle.sh&#39;</span>
+<span class="n">SPAWN_CALL</span> <span class="o">=</span> <span class="s2">&quot;spawn --userscript {} {{}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">JS_TOGGLE</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;tSh&quot;</span><span class="p">,</span> <span class="n">SPAWN_CALL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;*://{url:host}/*&quot;</span><span class="p">))</span>
+<span class="n">config</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;tSH&quot;</span><span class="p">,</span> <span class="n">SPAWN_CALL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;*://*.{url:host}/*&quot;</span><span class="p">))</span>
+<span class="n">config</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;tSu&quot;</span><span class="p">,</span> <span class="n">SPAWN_CALL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;{url}&quot;</span><span class="p">))</span>
+</pre></div>
+
+
+<p>And I created a new file in the configuration directory named <code>javascript_toggle.sh</code> with the following content:</p>
+<div class="highlight"><pre><span></span><span class="ch">#! /bin/bash</span>
+
+<span class="nv">CURRENT_DIR</span><span class="o">=</span><span class="k">$(</span>dirname <span class="nv">$0</span><span class="k">)</span>
+<span class="nv">ALLOWED_FILE</span><span class="o">=</span><span class="si">${</span><span class="nv">CURRENT_DIR</span><span class="si">}</span>/javascript_allowed_hosts.txt
+
+<span class="k">if</span> <span class="o">[</span> ! <span class="nv">$#</span> <span class="o">==</span> <span class="m">1</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="nv">PATTERN</span><span class="o">=</span><span class="nv">$1</span>
+<span class="k">if</span> grep -qF <span class="s2">&quot;</span><span class="si">${</span><span class="nv">PATTERN</span><span class="si">}</span><span class="s2">&quot;</span> <span class="si">${</span><span class="nv">ALLOWED_FILE</span><span class="si">}</span><span class="p">;</span> <span class="k">then</span>
+        <span class="c1"># Remove the Host from the allowed file</span>
+        sed -i <span class="s2">&quot;\}^</span><span class="si">${</span><span class="nv">PATTERN</span><span class="si">}</span>$<span class="s2">}d&quot;</span> <span class="si">${</span><span class="nv">ALLOWED_FILE</span><span class="si">}</span>
+        <span class="nb">echo</span> <span class="s2">&quot;set -p -t --pattern </span><span class="si">${</span><span class="nv">PATTERN</span><span class="si">}</span><span class="s2"> content.javascript.enabled False&quot;</span> &gt; <span class="si">${</span><span class="nv">QUTE_FIFO</span><span class="si">}</span>
+<span class="k">else</span>
+        <span class="c1"># Add the Host to the allowed file</span>
+        <span class="nb">echo</span> <span class="si">${</span><span class="nv">PATTERN</span><span class="si">}</span> &gt;&gt; <span class="si">${</span><span class="nv">ALLOWED_FILE</span><span class="si">}</span>
+        <span class="nb">echo</span> <span class="s2">&quot;set -p -t --pattern </span><span class="si">${</span><span class="nv">PATTERN</span><span class="si">}</span><span class="s2"> content.javascript.enabled True&quot;</span> &gt; <span class="si">${</span><span class="nv">QUTE_FIFO</span><span class="si">}</span>
+<span class="k">fi</span>
+<span class="nb">echo</span> reload &gt; <span class="si">${</span><span class="nv">QUTE_FIFO</span><span class="si">}</span>
+</pre></div>
+
+
+<p><em>(Note: Do not forget to make the script executable)</em></p>
+<p>The script keeps track of all hosts that are allowed to use JavaScript and also toggles the same setting in the running qutebrowser session by piping the command into the special file <code>QUTE_FIFO</code>.</p>
+<p>The snippet for the configuration file loads the accumulated patterns on startup and allows JavaScript only for those patterns.
+Furthermore it changes the bindings <code>tSh</code>, <code>tSH</code> and <code>tSu</code> to use the new script.
+Those new bindings are derived from the default bindings, which essentially do the same thing, but the default bindings only add the patterns to the <code>autoconfig.yml</code> file and with this change the patterns are stored in the file <code>javascript_allowed_hosts.txt</code>.</p>
+                <div class="clear"></div>
+
+                <div class="info">
+                    <a href="https://ro.sendahl.de/qutebrowser-javascript-config.html">posted at 11:00</a>
+                    &nbsp;&middot;&nbsp;<a href="https://ro.sendahl.de/category/configs.html" rel="tag">configs</a>
+                    &nbsp;&middot;
+                    &nbsp;<a href="https://ro.sendahl.de/tag/qutebrowser.html" class="tags">qutebrowser</a>
+                    &nbsp;<a href="https://ro.sendahl.de/tag/js.html" class="tags">js</a>
+                </div>
+            </article>            <h4 class="date">Aug 07, 2018</h4>
 
             <article class="post">
                 <h2 class="title">
@@ -55,7 +129,7 @@ Further inspection shows that Tumblr sets a cookie, that I accepted the GDPR not
 
                 <div class="info">
                     <a href="https://ro.sendahl.de/workaround-newsboat-tumblr.html">posted at 12:15</a>
-                    &nbsp;&middot;&nbsp;<a href="https://ro.sendahl.de/category/programs.html" rel="tag">programs</a>
+                    &nbsp;&middot;&nbsp;<a href="https://ro.sendahl.de/category/configs.html" rel="tag">configs</a>
                     &nbsp;&middot;
                     &nbsp;<a href="https://ro.sendahl.de/tag/newsboat.html" class="tags">newsboat</a>
                     &nbsp;<a href="https://ro.sendahl.de/tag/tumblr.html" class="tags">Tumblr</a>
