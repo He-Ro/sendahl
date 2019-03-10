@@ -7,7 +7,7 @@ Slug: workaround-newsboat-tumblr
 Authors: Hendrik Rosendahl
 Summary: A configuration workaround for Tumblr's GDPR notice in their RSS feed for newsboat
 
-**Update:** I got mixed results using the previously mentioned `Googlebot` user agent, so I updated the post with a newly working user agent string.
+**Update (10.03.2019):** I got mixed results using the previously mentioned `Googlebot` user agent, so I updated the post with a newly working user agent string.
 
 Recently [newsboat](https://newsboat.org/) displayed the following error while retrieving news from a Tumblr RSS feed:
 ```
