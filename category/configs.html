@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>ro.sendahl | articles in the "configs" category</title>
     <link rel="shortcut icon" type="image/png" href="https://ro.sendahl.de/favicon.png">
     <link rel="shortcut icon" type="image/x-icon" href="https://ro.sendahl.de/favicon.ico">
@@ -11,6 +12,8 @@
     <link rel="stylesheet" href="https://ro.sendahl.de/theme/css/pygments.css" type="text/css" />
     <link rel="stylesheet" href="https://ro.sendahl.de/theme/css/print.css" type="text/css" media="print" />
     <meta name="generator" content="Pelican" />
+    <meta name="description" content="" />
+    <meta name="author" content="Hendrik" />
 </head>
 <body>
     <header>
@@ -18,14 +21,14 @@
             <ul>
 
                 <li class="ephemeral selected"><a href="https://ro.sendahl.de/category/configs.html">configs</a></li>
-                <li><a href="https://ro.sendahl.de">Home</a></li>
+                <li><a href="https://ro.sendahl.de/">Home</a></li>
                 <li><a href="https://webmail.strato.com/appsuite/signin">Mail</a></li>
                 <li><a href="https://ro.sendahl.de/categories">Categories</a></li>
                 <li><a href="https://ro.sendahl.de/archives">Archives</a></li>
             </ul>
         </nav>
         <div class="header_box">
-            <h1><a href="https://ro.sendahl.de">ro.sendahl</a></h1>
+            <h1><a href="https://ro.sendahl.de/">ro.sendahl</a></h1>
         </div>
     </header>
     <div id="wrapper">
@@ -35,6 +38,9 @@
                 <h2 class="title">
                     <a href="https://ro.sendahl.de/qutebrowser-javascript-config.html" rel="bookmark" title="Permanent Link to &quot;My JavaScript toggle in qutebrowser&quot;">My JavaScript toggle in qutebrowser</a>
                 </h2>
+
+                
+                
 
                 <p>This post is about <a href="https://www.qutebrowser.org/">qutebrowser</a> the browser I am currently mainly using.
 It supports being controlled mainly with the keyboard and the keybindings are inspired by vim, which is a nice feature.</p>
@@ -110,7 +116,11 @@ Those new bindings are derived from the default bindings, which essentially do t
                     <a href="https://ro.sendahl.de/workaround-newsboat-tumblr.html" rel="bookmark" title="Permanent Link to &quot;Workaround for newsboat not able to access Tumblr RSS feed&quot;">Workaround for newsboat not able to access Tumblr RSS feed</a>
                 </h2>
 
-                <p>Recently <a href="https://newsboat.org/">newsboat</a> displayed the following error while retrieving news from a Tumblr RSS feed:</p>
+                
+                
+
+                <p><strong>Update (10.03.2019):</strong> I got mixed results using the previously mentioned <code>Googlebot</code> user agent, so I updated the post with a newly working user agent string.</p>
+<p>Recently <a href="https://newsboat.org/">newsboat</a> displayed the following error while retrieving news from a Tumblr RSS feed:</p>
 <div class="highlight"><pre><span></span>Error while retrieving http://hopooo.tumblr.com/rss: unsupported feed format
 </pre></div>
 
@@ -120,12 +130,23 @@ Those new bindings are derived from the default bindings, which essentially do t
 <p>Accepting the notice forwards you to the actual RSS feed.
 Further inspection shows that Tumblr sets a cookie, that I accepted the GDPR notice and does not show it in subsequent visits, <strong>but</strong> the RSS reader newsboat does not handle cookies.</p>
 <p>A workaround was posted for another RSS reader on their <a href="https://github.com/miniflux/miniflux/issues/140#issuecomment-408366528">GitHub page</a>, there it is noted, that if the user agent contains the word <em>Googlebot</em>, then Tumblr does not show the GDPR notice anymore.</p>
-<p>This is what I tried and it actually works by just setting</p>
-<div class="highlight"><pre><span></span>user-agent &quot;Googlebot&quot;
+<p>For some weeks now this workaround produces mixed results, where most of the time the unsupported feed format error came up again.</p>
+<p>So I tried to download the RSS feed with <code>wget</code>, where to my surprise no problems occurred.
+Then I set the user agent to <code>Googlebot</code> by running the command</p>
+<div class="highlight"><pre><span></span>$ wget http://hopooo.tumblr.com/rss -U <span class="s1">&#39;Googlebot&#39;</span>
 </pre></div>
 
 
-<p>in your <code>$XDG_CONFIG_HOME/newsboat/config</code> file (which is <code>~/.config/newsboat/config</code> for the most people), or if you do not follow the <a href="https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html">XDG basedir standard</a> then the <code>~/.newsboat/config</code> file.</p>
+<p>and sure enough the resulting page was the GDPR notice of Tumblr.
+I also tried to send no user agent string at all, but also then only the GDPR notice was coming back from Tumblr.</p>
+<p>So I researched which user agent string <code>wget</code> uses when no special string is supplied and it is of the form <code>Wget/[version]</code>.</p>
+<p>So putting</p>
+<div class="highlight"><pre><span></span>user-agent &quot;Wget/1.20.1&quot;
+</pre></div>
+
+
+<p>into your newsboat configuration file will make Tumblr RSS feed work again in newsboat… (at least for now).
+The configuration file of newsboat is the <code>$XDG_CONFIG_HOME/newsboat/config</code> file (which should be <code>~/.config/newsboat/config</code> for the most people), or if you do not follow the <a href="https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html">XDG basedir standard</a> then the <code>~/.newsboat/config</code> file.</p>
                 <div class="clear"></div>
 
                 <div class="info">
